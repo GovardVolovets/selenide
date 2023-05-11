@@ -1,5 +1,6 @@
 package ru.netology.web;
 
+import com.codeborne.selenide.Configuration;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 
@@ -15,6 +16,7 @@ import static com.codeborne.selenide.Selenide.*;
 class RegistrationTest {
     @Test
     void positiveRegisterSimple() {
+        Configuration.headless = true;
         open("http://localhost:9999");
         $("[placeholder='Город']").setValue("Москва");
         $(".menu-item").click();
@@ -35,6 +37,7 @@ class RegistrationTest {
 
     @Test
     void positiveRegisterHard() {
+        Configuration.headless = true;
         open("http://localhost:9999");
         $("[placeholder='Город']").setValue("Мо");
         $$(".menu-item").findBy(text("Москва")).click();
