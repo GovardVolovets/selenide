@@ -1,17 +1,15 @@
 package ru.netology.web;
 
-import com.codeborne.selenide.Configuration;
+import com.codeborne.selenide.Condition;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 
 import java.time.Duration;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Random;
 
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.*;
 import static com.codeborne.selenide.Selenide.*;
+import static ru.netology.web.DateGenerator.generateDate;
 
 class RegistrationTest {
     @Test
@@ -21,18 +19,19 @@ class RegistrationTest {
         $("[placeholder='Город']").setValue("Москва");
         $(".menu-item").click();
 
-        LocalDate currentDate = LocalDate.now();
-        LocalDate randomDate = currentDate.plusDays(3 + new Random().nextInt(14));
-        String dateValue = randomDate.format(DateTimeFormatter.ofPattern("ddMMyyyy"));
+        String planningDate = generateDate(5, "dd.MM.yyyy");
 
         $("[data-test-id=date]").doubleClick();
         $("[placeholder='Дата встречи']").sendKeys(Keys.BACK_SPACE);
-        $("[placeholder='Дата встречи']").setValue(dateValue);
+        $("[placeholder='Дата встречи']").setValue(planningDate);
         $("[name='name']").setValue("Иванов Иван");
         $("[name='phone']").setValue("+79095553322");
         $("[data-test-id=agreement]").click();
         $$("button").find(exactText("Забронировать")).click();
         $(withText("Успешно!")).should(appear, Duration.ofMillis(15000));
+        $(".notification__content")
+                .shouldHave(Condition.text("Встреча успешно забронирована на " + planningDate), Duration.ofSeconds(15))
+                .shouldBe(Condition.visible);
     }
 
     @Test
@@ -42,17 +41,26 @@ class RegistrationTest {
         $("[placeholder='Город']").setValue("Мо");
         $$(".menu-item").findBy(text("Москва")).click();
 
-        LocalDate currentDate = LocalDate.now();
-        LocalDate targetDate = currentDate.plusDays(7);
-        String dateValue = String.valueOf(targetDate.getDayOfMonth());
+        String planningDate = generateDate(7, "dd.MM.yyyy");
+
+        String day = DateCalculatorAssistant.getDay(planningDate);
+        String monthYear = DateCalculatorAssistant.getMonthYear(planningDate);
 
         $("[data-test-id=date]").click();
-        $$(".calendar__day").find(exactText(dateValue)).click();
+
+        while (!$(".calendar__name").text().contains(monthYear)) {
+            $$(".calendar__arrow_direction_right").get(1).click();
+        }
+
+        $$(".calendar__day").find(exactText(day)).click();
         $("[name='name']").setValue("Иванов Иван");
         $("[name='phone']").setValue("+79095553322");
         $("[data-test-id=agreement]").click();
         $$("button").find(exactText("Забронировать")).click();
         $(withText("Успешно!")).should(appear, Duration.ofMillis(15000));
+        $(".notification__content")
+                .shouldHave(Condition.text("Встреча успешно забронирована на " + planningDate), Duration.ofSeconds(15))
+                .shouldBe(Condition.visible);
     }
 }
 
