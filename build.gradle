@@ -20,7 +20,9 @@ dependencies {
     testImplementation 'com.codeborne:selenide:6.12.2'
 }
 
-test {
-    useJUnitPlatform()
-    systemProperty 'selenide.headless', System.getProperty('selenide.headless')
+tasks {
+    test {
+        useJUnitPlatform()
+        systemProperty 'selenide.headless', System.getProperty('selenide.headless')
+    }
 }
