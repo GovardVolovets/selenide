@@ -1,4 +1,4 @@
-package ru.netology.web;
+package ru.netology.web.test;
 
 import com.codeborne.selenide.Condition;
 import org.junit.jupiter.api.Test;
@@ -9,12 +9,11 @@ import java.time.Duration;
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.*;
 import static com.codeborne.selenide.Selenide.*;
-import static ru.netology.web.DateGenerator.generateDate;
+import static ru.netology.web.data.DateGenerator.generateDate;
 
 class RegistrationTest {
     @Test
     void positiveRegisterSimple() {
-
         open("http://localhost:9999");
         $("[placeholder='Город']").setValue("Москва");
         $(".menu-item").click();
@@ -29,26 +28,23 @@ class RegistrationTest {
         $("[data-test-id=agreement]").click();
         $$("button").find(exactText("Забронировать")).click();
         $(withText("Успешно!")).should(appear, Duration.ofMillis(15000));
-        $(".notification__content")
+        $("[data-test-id='notification']")
                 .shouldHave(Condition.text("Встреча успешно забронирована на " + planningDate), Duration.ofSeconds(15))
                 .shouldBe(Condition.visible);
     }
 
     @Test
     void positiveRegisterHard() {
-
         open("http://localhost:9999");
         $("[placeholder='Город']").setValue("Мо");
         $$(".menu-item").findBy(text("Москва")).click();
 
         String planningDate = generateDate(7, "dd.MM.yyyy");
-
-        String day = DateCalculatorAssistant.getDay(planningDate);
-        String monthYear = DateCalculatorAssistant.getMonthYear(planningDate);
+        String day = generateDate(7, "d");
 
         $("[data-test-id=date]").click();
 
-        while (!$(".calendar__name").text().contains(monthYear)) {
+        if (!generateDate(3, "MM").equals(generateDate(7, "MM"))) {
             $$(".calendar__arrow_direction_right").get(1).click();
         }
 
@@ -58,7 +54,7 @@ class RegistrationTest {
         $("[data-test-id=agreement]").click();
         $$("button").find(exactText("Забронировать")).click();
         $(withText("Успешно!")).should(appear, Duration.ofMillis(15000));
-        $(".notification__content")
+        $("[data-test-id='notification']")
                 .shouldHave(Condition.text("Встреча успешно забронирована на " + planningDate), Duration.ofSeconds(15))
                 .shouldBe(Condition.visible);
     }

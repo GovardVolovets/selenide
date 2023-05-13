@@ -1,4 +1,4 @@
-package ru.netology.web;
+package ru.netology.web.data;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
